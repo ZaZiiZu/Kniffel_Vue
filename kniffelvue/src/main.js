@@ -1,7 +1,13 @@
+import '@babel/polyfill'
+import './plugins/axios'
+import './plugins/vuetify'
+import Vuex from 'vuex'
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+
+Vue.use(Vuex)
 
 Vue.config.productionTip = false
 
