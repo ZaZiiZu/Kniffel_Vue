@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-navigation-drawer
+    <!-- <v-navigation-drawer
       persistent
       :mini-variant="miniVariant"
       :clipped="clipped"
@@ -44,9 +44,9 @@
         <v-icon>menu</v-icon>
       </v-btn>
     </v-toolbar>
-    <v-content>
-      <router-view/>
-    </v-content>
+    <v-content> -->
+    <router-view/>
+    <!-- </v-content>
     <v-navigation-drawer
       temporary
       :right="right"
@@ -65,15 +65,14 @@
     </v-navigation-drawer>
     <v-footer :fixed="fixed" app>
       <span>&copy; 2017</span>
-    </v-footer>
+    </v-footer> -->
   </v-app>
 </template>
 
 <script>
-
 export default {
   name: 'App',
-  data () {
+  data() {
     return {
       clipped: false,
       drawer: true,
