@@ -81,7 +81,7 @@ function get_samples(settings) {
     for (let roll = 1; roll <= rollsPerTurn; roll++) {
       log[turn] = log[turn] ? log[turn] : []
       if (roll == 1) log[turn].push(fixedDices)
-
+      asdf
       rolls1_settings.array = JSON.parse(JSON.stringify(fixedDices))
       rolledDices = get_rollsArray(rolls1_settings)
       fixedDices = get_X_of_a_kind(rolledDices)[0] || []
