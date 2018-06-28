@@ -31,7 +31,7 @@
       <!-- <li v-for="(key2, index2) in transfMatrix[index]" :key="index2">
         {{key2}}
       </li> -->
-    </li>
+    </li> 
     <br> __________________________________
     <br>
     <button @click="get_transM()">do it</button>
@@ -47,7 +47,7 @@ export default {
     return {
       settings: {
         alternatives: 2,
-        rolls: 5
+        rolls: 8
       },
       transfMatrix: {},
       normMatrix: {},
@@ -77,8 +77,8 @@ export default {
         flags: {
           existsNot: false,
           tooBig: false,
-          negateFlag: false,
           noChanceFlag: false,
+          negateFlag: false,
           fixOdds: true
         }
       }

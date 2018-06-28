@@ -1,7 +1,9 @@
 <template>
   <v-app>
-    <TransfMatrices></TransfMatrices>
     <div class="Kniffel">
+      <div style="padding: 20px; width: 100%">
+        <TransfMatrices></TransfMatrices>
+      </div>
       <v-btn @click="serverGet()"> buttooon </v-btn>
       <v-container fluid>
         <v-layout row wrap>
@@ -114,7 +116,7 @@ const math = require('mathjs')
 
 export default {
   name: 'Kniffel',
-  data () {
+  data() {
     return {
       sheet: sheetDef,
       layout: {
@@ -159,7 +161,7 @@ export default {
         }
       },
       state: {
-        reroute: false,
+        reroute: true,
         currentPlayer: 1,
         computerOpponentSet: new Set([0, 2]),
         newTurn: 1, // fängt mit 1 an, sonst gibt's unlustige fehler
@@ -183,7 +185,10 @@ export default {
         }
       },
       playerLog: null,
-      rollsOverride: { rollsAmount: null, rolls: [] },
+      rollsOverride: {
+        rollsAmount: null,
+        rolls: []
+      },
       time: {
         start: 0,
         end: 0
@@ -192,13 +197,14 @@ export default {
   },
 
   watch: {
-    'state.newTurn': function check_computersTurn () {
+    'state.newTurn': function check_computersTurn() {
       const aiSet = new Set(this.state.settings.activeAI)
       if (this.state.newTurn === 1) this.sheetDataFunc() // re-fresh the sheet, mainly with zero-padding
       if (
         this.state.newTurn === 0 && aiSet.has(this.state.currentPlayer)
       ) {
-        console.log('for real? ', aiSet, this.state.currentPlayer, aiSet.has(this.state.currentPlayer), JSON.stringify(aiSet))
+        console.log('for real? ', aiSet, this.state.currentPlayer, aiSet.has(this.state.currentPlayer), JSON.stringify(
+          aiSet))
         console.log('computers turn')
         this.state.computersTurn = true
       } else {
@@ -212,7 +218,7 @@ export default {
       // }
       return 0
     },
-    'state.newGame': function finish_log_with_sums () {
+    'state.newGame': function finish_log_with_sums() {
       if (this.state.newGame === 1) {
         for (let i = 1; i <= this.settingsCmptd.playerAmount; i += 1) {
           const score = this.sheetData[i][this.sheetData[i].length - 1].value
@@ -223,14 +229,14 @@ export default {
   },
 
   computed: {
-    timeRaw () {
+    timeRaw() {
       const end = this.time.end || 1
       const start = this.time.start || 1
       const time = end - start
       console.log('timeRaw: ', time)
       return time
     },
-    settingsCmptd () {
+    settingsCmptd() {
       const settings1 = {}
       settings1.playerAmount = this.state.settings.playerAmount || 2
       settings1.activeAI = new Set(this.state.settings.activeAI || [0])
@@ -238,28 +244,28 @@ export default {
 
       return settings1
     },
-    undoButton () {
+    undoButton() {
       return this.state.newTurn === 1 ? 'Undo turn!' : 'Undo turn!'
     },
-    scoreStats () {
+    scoreStats() {
       const lulz = {}
       lulz.last = this.loop.scoreTracker[this.loop.scoreTracker.length - 1]
       lulz.highest = this.loop.scoreTracker.length ? Math.max(...this.loop.scoreTracker) : 0
       lulz.lowest = this.loop.scoreTracker.length ? Math.min(...this.loop.scoreTracker) : 0
       lulz.amount = this.loop.scoreTracker.length
       lulz.average = this.loop.scoreTracker.length >= 2
-        ? this.loop.scoreTracker.reduce((a, b) => a + b) / lulz.amount
-        : this.loop.scoreTracker[0]
+          ? this.loop.scoreTracker.reduce((a, b) => a + b) / lulz.amount
+          : this.loop.scoreTracker[0]
       lulz.average = Math.round((lulz.average || 0) * 100) / 100
       lulz.sheetAvg = this.loop.arrayStorage.length >= 2
-        ? this.loop.arrayStorage.reduce((x, y) => math.add(x, y))
-        : this.loop.arrayStorage[0]
+          ? this.loop.arrayStorage.reduce((x, y) => math.add(x, y))
+          : this.loop.arrayStorage[0]
       lulz.sheetAvg = lulz.amount ? math.divide(lulz.sheetAvg, lulz.amount) : [0]
       lulz.sheetAvg = lulz.sheetAvg.map(x => Math.round((x || 0) * 100) / 100)
 
       lulz.sheetZeroChance = this.loop.arrayStorage.length >= 2
-        ? this.loop.arrayStorage.reduce((x, y) => math.add(x, y.map(z => (z !== 0 ? 0 : 1))), 0)
-        : this.loop.arrayStorage[0]
+          ? this.loop.arrayStorage.reduce((x, y) => math.add(x, y.map(z => (z !== 0 ? 0 : 1))), 0)
+          : this.loop.arrayStorage[0]
       lulz.sheetZeroChance = lulz.amount ? math.divide(lulz.sheetZeroChance, lulz.amount) : [0]
       lulz.sheetZeroChance = lulz.sheetZeroChance.map(a => (Math.round(a * 10000) / 100))
 
@@ -268,7 +274,7 @@ export default {
   },
 
   methods: {
-    timeFormatted (initialTime, initialUnit) {
+    timeFormatted(initialTime, initialUnit) {
       // returns: {raw: initialTime,
       //   rawUnit: initialUnit,
       //   norm: lowest time > 1normUnit,
@@ -287,17 +293,26 @@ export default {
         norm: 0,
         normUnit: 'ms'
       }
-      function lulzasdf (dafuq) {
+
+      function lulzasdf(dafuq) {
         let wheeeee = dafuq.number || 0
         let hohoho = dafuq.unit || 'ms'
-        if (wheeeee / timeUnits[hohoho] < 1) return { number: Math.ceil(wheeeee * 100) / 100, unit: hohoho }
+        if (wheeeee / timeUnits[hohoho] < 1) {
+          return {
+            number: Math.ceil(wheeeee * 100) / 100,
+            unit: hohoho
+          }
+        }
         wheeeee /= timeUnits[hohoho]
         hohoho = hohoho === 'ms' ? 's'
-          : hohoho === 's' ? 'min'
+            : hohoho === 's' ? 'min'
             : hohoho === 'min' ? 'h'
-              : hohoho === 'h' ? 'd'
-                : hohoho === 'd' ? 'd' : 'default'
-        return lulzasdf({ number: wheeeee, unit: hohoho })
+            : hohoho === 'h' ? 'd'
+            : hohoho === 'd' ? 'd' : 'default'
+        return lulzasdf({
+          number: wheeeee,
+          unit: hohoho
+        })
       }
       const arg = {
         number: time.raw,
@@ -308,7 +323,7 @@ export default {
       time.normUnit = response.unit || 'ms'
       return time
     },
-    serverGet () {
+    serverGet() {
       // this.$axios.post('http://localhost:4000/rolls', {
       //   dices: [1, 2, 3, 4, 5],
       //   numbers: '1568'
@@ -320,7 +335,7 @@ export default {
       //     console.log('error: ', error);
       //   });
     },
-    newSettings (settingsBundle) {
+    newSettings(settingsBundle) {
       // applying new settings
       const settingsS = this.state.settings
       settingsS.playerAmount = settingsBundle.playerAmount
@@ -331,7 +346,7 @@ export default {
       console.log('loops: ', settingsBundle.loopMax)
       this.new_game()
     },
-    sheetDataFunc () {
+    sheetDataFunc() {
       let x // x = {result: integer, dicesMatch: [], dicesMatchNot: [] }
       let j
       let rollsArray = []
@@ -348,7 +363,8 @@ export default {
           sheetDataColumnX: this.sheetData[this.state.currentPlayer],
           playerX: this.state.currentPlayer,
           rollsLeft: this.state.rollCounter,
-          turnsLeft: this.sheetData ? this.sheetData[this.state.currentPlayer].filter(n => !n.fixed).length : this.sheetLayout.length
+          turnsLeft: this.sheetData ? this.sheetData[this.state.currentPlayer].filter(n => !n.fixed).length : this
+            .sheetLayout.length
         })
         const cell = this.sheetData[this.state.currentPlayer][j]
         if (!cell.fixed) {
@@ -358,7 +374,7 @@ export default {
       }
       return Object.assign({}, this.sheetData)
     },
-    rollsOutput (rollsObject) {
+    rollsOutput(rollsObject) {
       if (!rollsObject.rollArray) {
         alert('no new rolls found')
         return
@@ -385,12 +401,12 @@ export default {
       // eslint-disable-next-line no-unused-vars
       const cheatz2 = this.sheetDataFunc() // makeshift glue... without this line, everything is fcked up!
     },
-    writeLogAdd (currentPlayer, message) {
+    writeLogAdd(currentPlayer, message) {
       const array = this.playerLog[currentPlayer]
       const pointer = array.length
       array[pointer] = array.unshift(message)
     },
-    writeLogRemoveLast (player, asdf) {
+    writeLogRemoveLast(player, asdf) {
       const column = player || this.state.currentPlayer
       const amount = asdf || 1
       const array = this.playerLog[column]
@@ -398,15 +414,13 @@ export default {
         array.shift()
       }
     },
-    fixCell (cellColAndRow) {
-      if (
-        !(
-          this.sheet[this.sheetData[cellColAndRow[0]][cellColAndRow[1]].sheetRowDef].anklickbar === 0 ||
+    fixCell(cellColAndRow) {
+      if (!(
+        this.sheet[this.sheetData[cellColAndRow[0]][cellColAndRow[1]].sheetRowDef].anklickbar === 0 ||
             this.sheetData[cellColAndRow[0]][cellColAndRow[1]].fixed ||
             cellColAndRow[0] !== this.state.currentPlayer ||
             this.state.newTurn
-        )
-      ) {
+      )) {
         this.state.oldTurn.player = this.state.currentPlayer
         this.state.oldTurn.fixedCell = [
           this.sheetData[cellColAndRow[0]][cellColAndRow[1]]
@@ -465,7 +479,7 @@ export default {
         }
       }
     },
-    generate_sheetData () {
+    generate_sheetData() {
       this.sheetData = {}
       for (let i = 1; i <= this.settingsCmptd.playerAmount; i += 1) {
         this.sheetData[i] = []
@@ -478,19 +492,19 @@ export default {
         }
       }
     },
-    generate_playerLog () {
+    generate_playerLog() {
       this.playerLog = []
       for (let i = 1; i <= this.settingsCmptd.playerAmount; i += 1) {
         this.playerLog[i] = []
       }
     },
-    undo_turn () {
+    undo_turn() {
       this.state.currentPlayer = this.state.oldTurn.player
       this.state.oldTurn.fixedCell['0'].fixed = false
       this.rollsOverride = !this.rollsOverride
       this.writeLogRemoveLast(this.state.currentPlayer, 2)
     },
-    new_game () {
+    new_game() {
       this.generate_sheetData()
       this.generate_playerLog()
       this.state.currentPlayer = this.playerNr || 1
@@ -522,16 +536,16 @@ export default {
         //   );
       }
     },
-    rolls_trigger () {
+    rolls_trigger() {
       this.rollsAP.getDices = !this.rollsAP.getDices
     },
-    loop_games () {
+    loop_games() {
       this.loop.currentRun = 0
       this.loop.runs = 50
       this.new_game()
     }
   },
-  created () {
+  created() {
     this.new_game()
   },
   // -----------------------------------------------------
