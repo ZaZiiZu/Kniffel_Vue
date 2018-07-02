@@ -5,7 +5,7 @@ class DicePicker {
     this.inputArray = input_obj.array
     this.data = this.get_groupedArr(this.inputArray)
     this.best = this.get_best(this.data)
-    this.picked = Array(this.best.amount).fill(this.best.number)
+    this.picked = Array(this.best.amount).fill(parseInt(this.best.number))
   }
   get_groupedArr(arr) {
     if (!arr || !arr.length) {
@@ -16,7 +16,6 @@ class DicePicker {
     arrCopy.map(el => {
       temp2dArray[el] = temp2dArray[el] ? temp2dArray[el] + 1 : 1
     })
-    console.log('dasfuq', temp2dArray)
 
     return temp2dArray || {}
   }
@@ -29,6 +28,5 @@ class DicePicker {
     }
   }
 }
-
 
 module.exports = DicePicker
