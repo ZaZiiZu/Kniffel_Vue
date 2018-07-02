@@ -108,16 +108,6 @@ function get_emptyMatrix(size_input) {
   return matrix
 }
 
-function arraySum(array) {
-  if (!array.length) {
-    return 0;
-  }
-  let sum = 0;
-  for (let i = array.length; i--;) {
-    sum += array[i];
-  }
-  return sum;
-}
 
 function sample_to_transfMatrix(samples_input, settings_input) {
   if (!samples_input) {
