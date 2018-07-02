@@ -1,6 +1,6 @@
 const _ = require('lodash')
-const DicePicker = require('../../src/objects/DicePicker.js')
-const DiceGenerator = require('../../src/objects/DiceGenerator.js')
+const DicePicker = require('./DicePicker.js')
+const DiceGenerator = require('./DiceGenerator.js')
 class Turn {
   constructor(settings_in) {
     this.settingsDefault = {
@@ -17,7 +17,7 @@ class Turn {
         target: 'xoak'
       }
     }
-    this.settings = _.defaultsDeep(settings_in, this.settingsDefault)
+    this.settings = _.cloneDeep(_.defaultsDeep(settings_in, this.settingsDefault))
     this.turnResults = this.run()
   }
   run() {
@@ -32,7 +32,6 @@ class Turn {
       this.settings.diceSettings.initArray = fixedDice.picked
       runData[loopIndex + 1] = fixedDice.picked
     }
-    console.log('rundata?!', runData)
     return runData
   }
 }
