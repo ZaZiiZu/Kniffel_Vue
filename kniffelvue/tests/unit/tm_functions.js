@@ -33,83 +33,34 @@
 // }
 const _ = require('lodash')
 
-const DicePicker = require('../../src/objects/DicePicker.js')
 const DiceGenerator = require('../../src/objects/DiceGenerator.js')
 const Turn = require('../../src/objects/Turn.js')
+const SampleCreator = require('../../src/objects/SampleCreator.js')
+const TransformMatrix = require('../../src/objects/TransformMatrix.js')
 
-const turn1 = new Turn()
-console.log('turn1?!: ', turn1.turnResults)
+// const turn1 = new Turn()
+// console.log('turn1!?!', turn1)
+// const sample1 = new SampleCreator()
+// console.log('turn1?!: ', sample1.data)
 
-class Samples {
-  constructor(settings) {
-    this.data = this.data || this.get_data(settings)
-
-  }
-  get_data(settings) {
-    console.log('lllll')
-    const initialValues = 123
-    const data = {}
-    for (let loopIndex = 0; loopIndex <= settings.length; loopIndex++) {
-      let currentTurn = new Turn(settings)
-      data[loopIndex] = currentTurn.array
-    }
-    return data
-  }
-}
-
-class TransformMatrix {
-  constructor(settings) {
-    this.settingsDefault = {
-      elementSettings: {
-        minValue: 1,
-        maxValue: 6,
-        alts: this.maxValue - this.minValue + 1
-      },
-      arraySettings: {
-        arrAmount: 3,
-        elementsPerArray: 5,
-        presetArray: []
-      },
-      sampleSettings: {
-        sampleAmount: 100
-      }
-    }
-    this.settings = _.defaultsDeep(settings, this.settingsDefault);
-    this.samples = this.samples || this.get_Samples();
-    this.absMatrix = this.absMatrix || this.get_absMatrix();
-    this.get_rabsMatrix = function () {
-      const blabla = functionINeverDeclared(settings.matrixStuff);
-      return blabla * 123;
-    };
-    this.matrix = this.matrix || this.get_matrix();
-    this.get_matrix = function () {
-      return theFunctionToGetHere(settings);
-    };
-    this.get_Samples = function (config) {
-      return new Samples(config);
-    };
-  }
-}
 
 // const newSample = new Samples({
 //   length: 4,
 //   var1: 0,
 //   varMax: 5,
 //   rollsPerRun: 5,
+
 //   inputconst1: 6,
 //   inputconst3123: 1
 // })
 
 module.exports = TransformMatrix
-module.exports = Samples
 module.exports = Turn
 module.exports = DiceGenerator
 
 
-
-
-
-
+const kniffelTransfMatrix = new TransformMatrix()
+console.log('that thing', kniffelTransfMatrix.trMatrix)
 
 
 // const settingsDefault = {

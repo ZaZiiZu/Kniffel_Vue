@@ -50,17 +50,17 @@ function get_X_of_a_kind(arr) {
   return temp2dArray || []
 }
 
-class RollsSettings {
-  constructor(lengthIn, minIn, maxIn, arrayIn) {
-    this.length = lengthIn > 0 ? lengthIn : 5;
-    this.min = minIn > 0 ? lengthIn : 1;
-    this.max = maxIn > 0 ? lengthIn : 6;
-    this.array = JSON.parse(JSON.stringify(arrayIn || [])) || [];
-    //deep-clone that shit, otherwise we get a bug-infestation!
-  }
-}
-// const rolls1_settings = new RollsSettings()
-const rolls1_settings = {}
+// class RollsSettings {
+//   constructor(lengthIn, minIn, maxIn, arrayIn) {
+//     this.length = lengthIn > 0 ? lengthIn : 5;
+//     this.min = minIn > 0 ? lengthIn : 1;
+//     this.max = maxIn > 0 ? lengthIn : 6;
+//     this.array = JSON.parse(JSON.stringify(arrayIn || [])) || [];
+//     //deep-clone that shit, otherwise we get a bug-infestation!
+//   }
+// }
+// // const rolls1_settings = new RollsSettings()
+// const rolls1_settings = {}
 
 
 class SampleSettings {
