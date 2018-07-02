@@ -24,7 +24,7 @@ class DiceGenerator {
     for (let rollNr = 0; rollNr < this.settings.length; rollNr++) {
       dataBlock[rollNr] = {
         value: this.settings.initArray[rollNr] ||
-                    Math.floor(Math.random() * (this.settings.max - this.settings.min + 1)) + this.settings.min,
+          Math.floor(Math.random() * (this.settings.max - this.settings.min + 1)) + this.settings.min,
         fixed: false
       }
     }
