@@ -13,7 +13,7 @@ function get_rollsArray(settings) {
   }
   return rollsArray
 }
-
+//wtf?!
 function get_X_of_a_kind(arr) {
   // const result = {};
   const rollsArrayCopy = arr.slice() || [0, 0, 0, 0, 0]
