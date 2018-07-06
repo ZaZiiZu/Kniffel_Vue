@@ -11,9 +11,9 @@ class SampleCreator {
         length: 3,
         initArray: [],
         diceSettings: {
-          length: 5,
+          length: 8,
           min: 1,
-          max: 6,
+          max: 3,
           initArray: []
         },
         pickerSettings: {

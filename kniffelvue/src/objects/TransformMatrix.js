@@ -1,11 +1,12 @@
 const _ = require('lodash')
+var util = require('util')
 
 const SampleCreator = require('./SampleCreator.js')
 
 class TransformMatrix {
   constructor(settings_in) {
     this.settingsDefault = {
-      roundAccuracy: 1000,
+      roundAccuracy: 100000,
 
       sample: {
         incrementInitArray: true,
@@ -14,9 +15,9 @@ class TransformMatrix {
           length: 3,
           initArray: [],
           diceSettings: {
-            length: 5,
+            length: 16,
             min: 1,
-            max: 6,
+            max: 5,
             initArray: []
           },
           pickerSettings: {
@@ -85,5 +86,8 @@ class TransformMatrix {
   }
 }
 
+const myTransitM = new TransformMatrix()
+console.log(myTransitM.trMatrix)
+require('child_process').spawn('clip').stdin.end(util.inspect((JSON.stringify(myTransitM.trMatrix))));
 
 module.exports = TransformMatrix

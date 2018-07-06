@@ -1,7 +1,8 @@
 <template>
-  <div>Sheeeeeeets:
-    <br>
-    <table>
+  <v-app>
+    <div>Sheeeeeeets:
+      <br>
+      <!-- <table>
       <tr v-for="(keyTable, indexTable) in normMatrix" :key="indexTable">
         <td v-for="(keyTable2, indexTable2) in keyTable" :key="indexTable2">
           {{Math.round(keyTable2.normOdds*10000)/10000}}
@@ -14,40 +15,46 @@
           {{Math.round(keyTable2.corrOdds*10000)/10000}}
         </td>
       </tr>
-    </table>
-    <table>
-      <tr v-for="(keyTable, indexTable) in transfMatrix" :key="indexTable">
-        <td v-for="(keyTable2, indexTable2) in keyTable" :key="indexTable2">
-          {{Math.round(keyTable2.normOdds*10000)/10000 + Math.round(corrMatrix[indexTable][indexTable2].corrOdds*10000)/10000}}
-        </td>
-      </tr>
-    </table>
-    <!-- <br> {{JSON.stringify(transfMatrix)}} -->
-    <br> __________________________________
-    <br>
-    <li v-for="(key, index) in transfMatrix" :key="index">
+    </table> -->
+      <table>
+        <tr v-for="(keyTable, indexTable) in transfMatrix" :key="indexTable">
+          <td v-for="(keyTable2, indexTable2) in keyTable" :key="indexTable2">
+            <br> {{Math.round(corrMatrix[indexTable][indexTable2].normOdds*10000)/10000}}
+            <br> {{Math.round(corrMatrix[indexTable][indexTable2].corrOdds*10000)/10000}}
+            <br> {{corrMatrix[indexTable][indexTable2].flag}}
+            <br> {{Math.round((keyTable2.normOdds + corrMatrix[indexTable][indexTable2].corrOdds)*10000)/10000 }}
+          </td>
+        </tr>
+      </table>
+      <!-- <br> {{JSON.stringify(transfMatrix)}} -->
+      <br> __________________________________
+      <br>
+      <!-- <li v-for="(key, index) in transfMatrix" :key="index">
       {{index}}:
-      <ul v-for="(key2, index) in key">{{index}} : {{key2}}</ul>
-      <!-- <li v-for="(key2, index2) in transfMatrix[index]" :key="index2">
-        {{key2}}
-      </li> -->
-    </li> 
-    <br> __________________________________
-    <br>
-    <button @click="get_transM()">do it</button>
-  </div>
+      <ul v-for="(key2, index2) in key">{{index}} : {{transfMatrix[index][index2]}}</ul>
+    </li> -->
+      <br> __________________________________
+      <br>
+      <button @click="get_transM()">do it</button>
+      <v-text-field id="inputAlts" v-model.number="settings.alternatives" type="number" label="Amount of alternatives:" placeholder="6"
+        size='5' min="1" max="50"></v-text-field>
+      <v-text-field id="inputRolls" v-model.number="settings.rolls" type="number" label="Amount of rolls:" placeholder="5" size='5'
+        min="1" max="50"></v-text-field>
+    </div>
+  </v-app>
 </template>
 
 <script>
 const math = require('mathjs')
+const _ = require('lodash')
 
 export default {
   name: 'TransfMatrices',
   data() {
     return {
       settings: {
-        alternatives: 2,
-        rolls: 8
+        alternatives: 3,
+        rolls: 15
       },
       transfMatrix: {},
       normMatrix: {},
@@ -66,6 +73,7 @@ export default {
       this.normMatrix = this.get_normMatrix(alternatives, size)
       this.corrMatrix = this.get_corrMatrix(alternatives, size, this.normMatrix)
       this.transfMatrix = this.normMatrix
+      console.log('transmatrix: ', this.transfMatrix)
       return this.transfMatrix
     },
     get_normMatrix(alternatives, size) {
@@ -104,8 +112,8 @@ export default {
           // // console.log('lower left: ',
           //   [fixed + 1] + " " + [need] + " = " + JSON.stringify(lowerLeft))
           cell.normOdds = (fixed === size) && (need === size) ? 1
-              : lowerLeft.normOdds * chanceOnly +
-              lowerRight.normOdds * chanceExcept
+              : lowerLeft.normOdds * chanceOnly + lowerRight.normOdds *
+              chanceExcept
           cell.id = [fixed, need]
           // cell.value = math.combinations(size - fixed, need) || 0
           sheet[fixed][need] = cell
@@ -128,35 +136,20 @@ export default {
           evenOutFlag: false,
           fixOdds: false,
           default: true
-        }
+        },
+        flag: null
       }
-      const chanceOnly = 1 / alternatives
-      const chanceExcept = (alternatives - 1) / alternatives
       for (let fixed = size; fixed >= 1; fixed--) {
         sheet[fixed] = {}
         for (let need = size; need >= 1; need--) {
-          // let lowerRight = null
-          // let lowerLeft = null
           const cell = JSON.parse(JSON.stringify(cellDef))
           cell.id = [fixed, need]
           sheet[fixed][need] = cell
-          // if (sheet && sheet[fixed + 1] && sheet[fixed + 1][need + 1]) {
-          //   lowerRight = math.clone(sheet[fixed + 1][need + 1])
-          // } else lowerRight = math.clone(cellDef)
-          // if (sheet && sheet[fixed + 1] && sheet[fixed + 1][need]) {
-          //   lowerLeft = math.clone(sheet[fixed + 1][need])
-          // } else lowerLeft = math.clone(cellDef)
-
           cell.flags = this.get_flags(normMatrix, sheet, [fixed, need], cell)
-
-          // // console.log('looooop: ', fixed, need)
+          cell.flag = _.invertBy(cell.flags)[true][0]
           const asdfasdf = Object.keys(sheet[fixed][need].flags)
-          // // console.log('asdfasdf: ', asdfasdf, cell.flags)
           const filtered = asdfasdf.filter(x => sheet[fixed][need].flags[x] == true)
-          // // console.log('filtered: ', filtered)
-          // if (filtered[0] === "negateFlag") {
-          //   cell.corrOdds = this.sumif_row(Object.values(sheet[fixed]), filtered[0])
-          // }
+          cell.normOdds = normMatrix[fixed][need].normOdds
           switch (filtered[0]) {
             case 'existsNot':
               cell.corrOdds = 0;
@@ -171,7 +164,8 @@ export default {
               cell.corrOdds = this.negate(Object.values(sheet[fixed]), need);
               break
             case 'evenOutFlag':
-              cell.corrOdds = this.even_out(Object.values(normMatrix[fixed]), Object.values(sheet[fixed]), need);
+              cell.corrOdds = this.even_out(Object.values(normMatrix[fixed]),
+                Object.values(sheet[fixed]), need);
               break
             case 'fixOdds':
               cell.corrOdds = this.corrections(alternatives, fixed, need, size);
@@ -209,26 +203,25 @@ export default {
       }
       flags.tooBig = false
 
-      // if ((alternatives - 1) * (need - 1) + (need - fixed) <= (size - fixed)) {
-      if ((alternatives) * (need) - fixed < (size - fixed)) {
+      if (need * alternatives < size) {
         flags.noChanceFlag = true
         return flags
       }
       flags.noChanceFlag = false
 
-      if (fixed + need < size && need <= fixed) {
+      if (fixed == need) {
         flags.negateFlag = true
         return flags
       }
       flags.negateFlag = false
 
-      if ((alternatives - 1) * (need - 1) + (need - fixed) <= (size - fixed)) {
+      if ((alternatives - 1) * (need - 1) + (need - fixed) < (size - fixed) + 1) {
         flags.evenOutFlag = true
         return flags
       }
       flags.evenOutFlag = false
 
-      if ((need + fixed < (size + 1)) && (need > fixed)) {
+      if (need + fixed <= (size) && (need > fixed)) {
         flags.fixOdds = true
         return flags
       }
@@ -265,7 +258,8 @@ export default {
       const size = size_i
       const combinations = math.combinations(size - fixed, need)
       const factorX = math.min(math.floor((size - fixed) / need), alts - 1)
-      const correction = (alts - 1) / alts * (1 / alts) ** (need - 1) * ((alts - factorX) / alts) ** (size - fixed -
+      const correction = (alts - 1) / alts * (1 / alts) ** (need - 1) * ((alts - factorX) / alts) ** (size -
+          fixed -
           need) * (combinations - factorX + 1)
       return correction
     },
