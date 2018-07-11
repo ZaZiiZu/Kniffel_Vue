@@ -206,7 +206,7 @@ function extract_matching_asBoolean(dices, aimedCell) {
     // if (!arrCut || !arrCut[0]) return dices;
     for (let k = 0; k < arrCut.length; k++) {
       if (dices[i] === arrCut[k]) {
-        dices[i] = 0
+        dices[i] = false
         // dices.splice(i, 1);
         // i--;
         arrCut.splice(k, 1);
@@ -215,7 +215,7 @@ function extract_matching_asBoolean(dices, aimedCell) {
     }
   }
   dices.forEach((element, index) => {
-    dices[index] = element > 0 ? 1 : 0
+    dices[index] = element > 0
   });
   console.log('dices??????????????????????', dices)
   return dices
