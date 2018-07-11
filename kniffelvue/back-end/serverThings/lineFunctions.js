@@ -47,7 +47,6 @@ function get_stats(input) {
     potentialRolls: input.rollsLeft,
     minLength: lowestFixed
   })
-  // console.log('oddsArray:', oddsArray)
   const sharedLength = Math.min(possibleResultsArray.length, oddsArray.length)
   const array1 = possibleResultsArray.slice(0, sharedLength)
   const array2 = oddsArray.slice(0, sharedLength)
@@ -60,13 +59,10 @@ function get_stats(input) {
     }
     datObject[i] = subObject
   }
-  // console.log('dat object: ', datObject)
   const factoredArray = math.dotMultiply(array1, array2)
   const average = arraySum(factoredArray)
   const keys = Object.keys(datObject)
-  // console.log('keys: ', keys)
   const filtered = keys.filter(keyIndex => datObject[keyIndex].odds > 0)
-  // console.log('filtered: ', filtered)
   const minValue = datObject[filtered[0]].value || 0
   const minOdds = datObject[filtered[0]].odds
   const maxValue = datObject[filtered[filtered.length - 1]].value || 0
@@ -74,8 +70,6 @@ function get_stats(input) {
   const likelyOdds = Math.max(...array2)
   const likelyValue = datObject[keys.filter(keyIndex => datObject[keyIndex].odds == likelyOdds)].value
 
-  // console.log('average: ', average)
-  // console.log('expected: ', likelyValue)
   const elObjecte = {
     input: input,
     valuesArray: possibleResultsArray,
@@ -261,11 +255,8 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    // console.log('stats!', statistics)
     conf.x.focusPrio = Math.round(statistics.result.average / statistics.result.maxValue * (boost ? 2 : 1) * 1000) / 1000
     conf.x.pickPrio = conf.x.result / conf.x.potentialMax
-    // console.log('stats!', statistics)
-    // console.log('focusPrio: ', conf.x.focusPrio, statistics.result.average, statistics.result.maxValue, boost)
     // conf.x.focusPrio = boost ? math.pow(sheetLayout[currentRow].sums, conf.x.dicesMatch.length / variableZ)
     //   : sheetLayout[currentRow].sums * conf.x.dicesMatch.length
     // conf.x.pickPrio = conf.x.dicesMatch.length < 3
@@ -308,7 +299,6 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    // console.log('stats!', statistics)
     conf.x.focusPrio = Math.round(statistics.result.likelyValue / statistics.result.maxValue * 1000) / 1000 || 0
     conf.x.pickPrio = conf.x.result / conf.x.potentialMax || 0
 
@@ -347,7 +337,6 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    // console.log('stats!', statistics)
     conf.x.focusPrio = Math.round((statistics.result.likelyValue || statistics.result.average) / statistics.result.maxValue * 1000) / 1000 || 0
     conf.x.pickPrio = conf.x.result / conf.x.potential || 0
     // conf.x.focusPrio = conf.x.potential * (conf.x.dicesMatch.length / needed)
@@ -378,7 +367,6 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    // console.log('stats!', statistics)
     conf.x.focusPrio = Math.round((statistics.result.likelyValue || statistics.result.average) / statistics.result.maxValue * 1000) / 1000 || 0
     conf.x.pickPrio = conf.x.result / conf.x.potential || 0
     // conf.x.priority = (1 - 0.5 * boost) * conf.x.potential
@@ -409,7 +397,6 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    // console.log('stats!', statistics)
     conf.x.focusPrio = Math.round((statistics.result.average) / statistics.result.maxValue * 1000) / 1000 || 0
     conf.x.pickPrio = conf.x.result / conf.x.potential || 0
     // conf.x.priority = (1 - 0.5 * boost) * conf.x.potential
@@ -445,10 +432,8 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    // console.log('stats!', statistics)
     conf.x.focusPrio = Math.round(statistics.result.average / statistics.result.maxValue * 1000) / 1000 || 0
     conf.x.pickPrio = conf.x.result / conf.x.potential || 0
-    console.log('kniffelInfo: ', statistics)
     // const boost = sheetDataColumnX[8].value ? 0 : 1
     // conf.x.priority = (1 - 0.5 * boost) * conf.x.potential
     // conf.x.focusPrio = conf.x.potential * (conf.x.dicesMatch.length / needed)

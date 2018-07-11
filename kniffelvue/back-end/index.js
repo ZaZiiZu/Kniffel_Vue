@@ -45,21 +45,41 @@ app.use((req, res, next) => {
 //   });
 // });
 
+
+
 app.post('/yahtzee/turn', (req, res) => {
   const turnInfo = {
-    dices: req.DiceSet,
-    throwsLeft: req.ThrowsLeft,
-    sheetColumn: req.SheetColumn
+    dices: req.body.DiceSet,
+    throwsLeft: req.body.ThrowsLeft,
+    sheetColumn: req.body.SheetColumn
   }
   const analyzedSheet = new Sheet(turnInfo.sheetColumn, turnInfo.dices, turnInfo.throwsLeft)
   const returnObj = get_return(turnInfo.throwsLeft, turnInfo.dices, analyzedSheet.analyzedColumn)
   res.json({
-    DiceLocks: returnObj.dices,
-    CategoryIndex: returnObj.cell
+    DiceLocks: returnObj.DiceLocks,
+    CategoryIndex: returnObj.CategoryIndex,
 
   });
 });
 
+app.get('/turn', (req, res) => {
+  console.log('request:', req.query)
+  console.log('_________')
+  const turnInfo = {
+    dices: JSON.parse(req.query.DiceSet),
+    throwsLeft: JSON.parse(req.query.ThrowsLeft),
+    sheetColumn: JSON.parse(req.query.SheetColumn)
+  }
+  const analyzedSheet = new Sheet(turnInfo.sheetColumn, turnInfo.dices, turnInfo.throwsLeft)
+  const returnObj = get_return(turnInfo.throwsLeft, turnInfo.dices, analyzedSheet.analyzedColumn)
+  console.log('answer?', returnObj)
+  res.json({
+    DiceLocks: returnObj.DiceLocks,
+    CategoryIndex: returnObj.CategoryIndex,
+    // reqWas: req.body
+
+  });
+});
 
 
 /*  Viktors little helpers    */
@@ -73,6 +93,7 @@ function get_return(rollsLeft, dices, playerColumn) {
   const returnObj = {}
   returnObj.DiceLocks = extract_matching_asBoolean(dices, aimedCell)
   returnObj.CategoryIndex = list.sortedPick.shift().sheetRowDef - 1
+  console.log('return????!', returnObj)
   return returnObj
 }
 
@@ -90,7 +111,7 @@ class List {
     array = !(array.length > 1)
       ? array
       : array.filter(cell => !(cell.data.potential === 0 || cell.data.dicesMatch.length === 0))
-    return array
+    return this.get_clone(array)
   }
   get_sortedArr(input_arr, priority) {
     let prio = priority || "focusPrio"
@@ -112,7 +133,7 @@ class List {
       if (a.data.potential < b.data.potential) return 1;
       return 0;
     }); // Prioritize using focusPrio
-    return array
+    return this.get_clone(array)
   }
   get_clone(input) {
     return JSON.parse(JSON.stringify(input))
@@ -182,7 +203,7 @@ function extract_matching_asBoolean(dices, aimedCell) {
   const arrCut = !aimedCell ? [] : aimedCell.data.dicesMatchNot || [];
   for (let i = 0; i < dices.length; i++) {
     //cut out the "matchNot" out of rollArray
-    if (!arrCut || !arrCut[0]) return dices;
+    // if (!arrCut || !arrCut[0]) return dices;
     for (let k = 0; k < arrCut.length; k++) {
       if (dices[i] === arrCut[k]) {
         dices[i] = 0
@@ -196,6 +217,7 @@ function extract_matching_asBoolean(dices, aimedCell) {
   dices.forEach((element, index) => {
     dices[index] = element > 0 ? 1 : 0
   });
+  console.log('dices??????????????????????', dices)
   return dices
 }
 
