@@ -73,8 +73,8 @@ function get_stats(input) {
   const likelyOdds = Math.max(...array2)
   const likelyValue = datObject[keys.filter(keyIndex => datObject[keyIndex].odds == likelyOdds)].value
 
-  console.log('average: ', average)
-  console.log('expected: ', likelyValue)
+  // console.log('average: ', average)
+  // console.log('expected: ', likelyValue)
   const elObjecte = {
     input: input,
     valuesArray: possibleResultsArray,
@@ -283,7 +283,7 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    console.log('stats!', statistics)
+    // console.log('stats!', statistics)
 
     conf.x.focusPrio = boost ? math.pow(sheetLayout[currentRow].sums, conf.x.dicesMatch.length / variableZ)
       : sheetLayout[currentRow].sums * conf.x.dicesMatch.length

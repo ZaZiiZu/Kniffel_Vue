@@ -1,9 +1,9 @@
 <template>
   <v-app>
     <div class="Kniffel">
-      <div style="padding: 20px; width: 100%">
+      <!-- <div style="padding: 20px; width: 100%">
         <TransfMatrices></TransfMatrices>
-      </div>
+      </div> -->
       <v-btn @click="serverGet()"> buttooon </v-btn>
       <v-container fluid>
         <v-layout row wrap>
