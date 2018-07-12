@@ -226,11 +226,6 @@ function getConf(asdf) {
   }
 }
 
-function bonusUpperCalc(total, num) {
-  let upper = num.sheetRowDef > 6 ? 0 : num.value || 0
-  let last = total.value === undefined ? total : total.value
-  return last + upper
-}
 const lineFunctions = {
   matching(lFObjectInput) {
     let conf = getConf()
@@ -252,6 +247,7 @@ const lineFunctions = {
       conf.x.potential = conf.x.dicesMatch.length >= 3 ? conf.x.result : conf.x.potential
       conf.x.potentialMax = sheetDataColumnX[9].value + conf.x.result >= 63 ? conf.x.result : conf.x.potential
     }
+    const boost = sheetDataColumnX[8].value ? 0 : 1
 
     const potentialArray = Array(rollsAsArray.length + 1).fill().map((x, i) => (i * sheetLayout[currentRow].sums))
     const statistics = get_stats({
@@ -259,12 +255,20 @@ const lineFunctions = {
       minLength: conf.x.dicesMatch.length || 0,
       possibleResults: potentialArray
     })
-    const bonusUpper = Object.values(sheetDataColumnX).reduce(bonusUpperCalc)
-    const boost = (bonusUpper >= 63 && statistics.result.likelyValue / statistics.result.maxValue >= 0.7) ? 0 : 1
-    // console.log('bonus?!: ', statistics.result, statistics.result.likelyValue, statistics.result.maxValue, (statistics.result.likelyValue / statistics.result.maxValue) >= 0.5)
     conf.x.focusPrio = Math.round(statistics.result.average / statistics.result.maxValue * (boost ? 2 : 1) * 1000) / 1000
-    // console.log('focus: ', statistics.result.average, statistics.result.maxValue, boost, conf.x.focusPrio)
-    conf.x.pickPrio = (conf.x.result * (1 + 1 * boost)) / conf.x.potentialMax
+    conf.x.pickPrio = conf.x.result / conf.x.potentialMax
+    // conf.x.focusPrio = boost ? math.pow(sheetLayout[currentRow].sums, conf.x.dicesMatch.length / variableZ)
+    //   : sheetLayout[currentRow].sums * conf.x.dicesMatch.length
+    // conf.x.pickPrio = conf.x.dicesMatch.length < 3
+    //   ? conf.x.result * (1 - variableX)
+    //   : conf.x.dicesMatch.length >= 3
+    //   ? (boost * 10 + 1) * conf.x.result
+    //   : conf.x.result * factors[currentRow]
+    // conf.x.priority = conf.x.dicesMatch.length < 3
+    //   ? conf.x.potential * (1 - variableX)
+    //   : conf.x.dicesMatch.length >= 3
+    //   ? (1 + 10 * boost) * conf.x.potential : conf.x.potential
+    // conf.x.dicesNeeded = []
     return conf.x;
   },
   pasch(lFObjectInput) {

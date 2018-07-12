@@ -1,5 +1,4 @@
-const electron = require('electron')
-const lineFunctions = require('./serverThings/lineFunctions')
+const lineFunctions = require('./serverThings/lineFunctionsBackup')
 const sheetLayout = require('./serverThings/sheetDef')
 
 const express = require('express');
@@ -11,7 +10,7 @@ const app = express();
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(cors());
-const port = process.env.PORT || 62100;
+const port = process.env.PORT || 62101;
 
 /*     starting server and listening to connections   */
 app.listen(port, () => {
@@ -58,14 +57,6 @@ app.post('/yahtzee/turn', (req, res) => {
     throwsLeft: req.body.ThrowsLeft,
     sheetColumn: req.body.SheetColumn
   }
-  if (turnInfo.sheetColumn.filter(el => el === null).length <= 0) {
-    console.log('Empty sheetColumn, eat shit!')
-    res.json({
-      DiceLocks: [],
-      CategoryIndex: 0
-    })
-    return
-  }
   const analyzedSheet = new Sheet(turnInfo.sheetColumn, turnInfo.dices, turnInfo.throwsLeft)
   const returnObj = get_return(turnInfo.throwsLeft, turnInfo.dices, analyzedSheet.analyzedColumn)
   console.log('response:', returnObj)
@@ -76,24 +67,24 @@ app.post('/yahtzee/turn', (req, res) => {
   });
 });
 
-// app.get('/turn', (req, res) => {
-//   console.log('request:', req.query)
-//   console.log('_________')
-//   const turnInfo = {
-//     dices: JSON.parse(req.query.DiceSet),
-//     throwsLeft: JSON.parse(req.query.ThrowsLeft),
-//     sheetColumn: JSON.parse(req.query.SheetColumn)
-//   }
-//   const analyzedSheet = new Sheet(turnInfo.sheetColumn, turnInfo.dices, turnInfo.throwsLeft)
-//   const returnObj = get_return(turnInfo.throwsLeft, turnInfo.dices, analyzedSheet.analyzedColumn)
-//   console.log('answer?', returnObj)
-//   res.json({
-//     DiceLocks: returnObj.DiceLocks,
-//     CategoryIndex: returnObj.CategoryIndex,
-//     // reqWas: req.body
+app.get('/turn', (req, res) => {
+  console.log('request:', req.query)
+  console.log('_________')
+  const turnInfo = {
+    dices: JSON.parse(req.query.DiceSet),
+    throwsLeft: JSON.parse(req.query.ThrowsLeft),
+    sheetColumn: JSON.parse(req.query.SheetColumn)
+  }
+  const analyzedSheet = new Sheet(turnInfo.sheetColumn, turnInfo.dices, turnInfo.throwsLeft)
+  const returnObj = get_return(turnInfo.throwsLeft, turnInfo.dices, analyzedSheet.analyzedColumn)
+  console.log('answer?', returnObj)
+  res.json({
+    DiceLocks: returnObj.DiceLocks,
+    CategoryIndex: returnObj.CategoryIndex,
+    // reqWas: req.body
 
-//   });
-// });
+  });
+});
 
 
 /*  Viktors little helpers    */

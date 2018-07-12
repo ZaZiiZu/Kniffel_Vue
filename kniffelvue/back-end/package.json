@@ -7,6 +7,14 @@
     "start": "electron",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "build": {
+    "appId": "kniffelBackend.app",
+    "win": {
+      "portable": "true",
+      "asar": "true"
+    },
+    "nsis": {}
+  },
   "author": "Vig",
   "license": "ISC",
   "dependencies": {
