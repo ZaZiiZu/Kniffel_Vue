@@ -1,13 +1,15 @@
 <template>
   <v-app>
     <v-container>
-      <v-text-field id="inputPlayerAmount" v-model.number="playerAmount" type="number" label="Players" placeholder="2" size='5'
-        min='1' max="5"></v-text-field>
       <v-container fluid>
-        <v-subheader>enable AI for players</v-subheader>
-        <v-layout wrap row>
-          <v-flex v-for="i in playerAmount" :key='i' xs12 sm6 md6>
-            <v-switch :label="'Player '+i" v-model="activeAIObj[i]" hide-details></v-switch>
+        <v-subheader>Select players:</v-subheader>
+        <v-text-field id="inputPlayerAmount" v-model.number="playerAmount" type="number" label="Players" placeholder="2" size='5'
+          min='1' max="5"></v-text-field>
+        <v-layout row wrap>
+          <v-flex v-for="i in playerAmount" :key='i' xs12 sm12 md12>
+            <v-switch :label="compSettings[i].isActive ? `Player ${i}: computer` : `Player ${i}: player`" v-model="compSettings[i].isActive"
+              hide-details></v-switch>
+            <v-text-field v-if="compSettings[i].isActive" v-model="compSettings[i].adress" label="Adress" placeholder="http://localhost:62100"></v-text-field>
           </v-flex>
         </v-layout>
       </v-container>
@@ -26,10 +28,20 @@
 <script>
 export default {
   name: 'Settings',
-  data () {
+  data() {
     return {
       playerAmount: 1,
-      activeAIObj: { 0: false, 1: true, 2: true },
+      compSettings: {
+        1: {
+          isActive: true,
+          adress: "http://localhost:62100"
+        },
+        2: {
+          isActive: true,
+          adress: "http://localhost:62100"
+        }
+      },
+      defaultAdress: "http://localhost:62100",
       diceAmountNew: 5,
       maxRollsNew: 3,
       loopMax: 0
@@ -38,30 +50,30 @@ export default {
 
   props: [],
 
-  watch: {},
-  computed: {
-    // filters active AI out of possible players and returns them as numbers in array
-    activeAIArray () {
-      let array = []
-      array = Object.keys(this.activeAIObj)
-        .filter(x => this.activeAIObj[x] && parseInt(x, 10) <= this.playerAmount)
-        .map(x => parseInt(x, 10))
-      return array
+  watch: {
+    playerAmount() { // expand the compSettings when playerAmount changes
+      for (let i = 0; i <= this.playerAmount; i++) {
+        if (!this.compSettings[i]) {
+          this.$set(this.compSettings, i, { // this.$set to add Reactivity to new sub-objects of compSettings. Reactivity, babyyyyyy!
+            adress: this.defaultAdress
+          })
+        }
+      }
     }
   },
+  computed: {},
   methods: {
-    apply_settings () {
-      this.$emit('newSettings',
-        {
-          playerAmount: this.playerAmount,
-          activeAI: this.activeAIArray,
-          diceAmountNew: this.diceAmountNew,
-          maxRollsNew: this.maxRollsNew,
-          loopMax: this.loopMax
-        })
+    apply_settings() {
+      this.$emit('newSettings', {
+        playerAmount: this.playerAmount,
+        compSettings: this.compSettings,
+        diceAmountNew: this.diceAmountNew,
+        maxRollsNew: this.maxRollsNew,
+        loopMax: this.loopMax
+      })
     }
   },
-  mounted () {
+  mounted() {
     this.apply_settings()
   }
 }
