@@ -27,18 +27,16 @@ export default {
     return {
       dicesCopy: null,
       rollCounter: null,
-      lastRolls: [],
-      indexTransf: {}
+      lastRolls: []
     }
   },
   watch: {
-    /* computers turn, triggers after new turn started (1->0)
-                                                                    lockingDices() loops through all available rolls,
-                                                                    do_magic() picks highest-prioritized cell and emits its' coordinates
-                                                                    */
+    // /*
+    // computers turn, triggers after new turn started (1->0)
+    // doTurn() makes full turn via API, lockingDices is local solution but not updated!,
+    // */
     'state.newTurn': function () {
       if (this.state.computersTurn) {
-        // console.log('wut')
         this.rollCounter = this.state.allRolls[0].length - 1
         // eslint-disable-next-line
           this.state.reroute ? this.doTurn() : this.lockingDices();
@@ -85,14 +83,18 @@ export default {
     },
     sheetColumnArr() {
       let sheetArray = []
+      let transformArr = []
       let copy = JSON.parse(JSON.stringify(this.newSheet[this.state.currentPlayer]))
       copy = copy.filter((el, index) => this.sheetLayout[index].anklickbar)
       copy.forEach((el, index) => {
 
         sheetArray[index] = el.fixed ? el.value : null
-        this.indexTransf[index] = el.sheetRowDef
+        transformArr[index] = el.sheetRowDef
       })
-      return sheetArray
+      return {
+        sheet: sheetArray,
+        transformArr: transformArr
+      }
     }
   },
   methods: {
@@ -108,11 +110,12 @@ export default {
       const reqObject = {
         ThrowsLeft: this.rollCounter || 0,
         DiceSet: previousDices || this.state.allRolls[0][0].slice() || [0], //take previous dices, or if none there use new batch with .slice() to copy/clone it
-        SheetColumn: this.sheetColumnArr || [0]
+        SheetColumn: this.sheetColumnArr.sheet || [0]
 
       }
       try {
-        const resObject = await axios.post('http://localhost:62100/yahtzee/turn', reqObject)
+        const resObject = await axios.post(this.state.settings.compSettings[this.currentPlayer].adress +
+            '/yahtzee/turn', reqObject)
         const rollsBoolArr = resObject.data.DiceLocks
         const catPickIndex = resObject.data.CategoryIndex
         if (this.rollCounter > 0) {
@@ -123,7 +126,7 @@ export default {
         } else {
           this.$emit('fixedCell', [
             this.state.currentPlayer,
-            this.indexTransf[catPickIndex]
+            this.sheetColumnArr.transformArr[catPickIndex]
           ])
 
         }
@@ -219,9 +222,7 @@ export default {
       const rollsArray = rollsAll[0].slice().sort() // initial array
       const loopLengthA = this.rollCounter
       for (let j = 0; j <= loopLengthA; j++) {
-        const nextArray = rollsAll[j + 1]
-            ? JSON.parse(JSON.stringify(rollsAll[j + 1].slice()))
-            : [] // next array
+        const nextArray = rollsAll[j + 1] ? JSON.parse(JSON.stringify(rollsAll[j + 1].slice())) : [] // next array
         this.lastRolls = rollsArray
         this.$emit('newRolls', {
           rollArray: rollsArray,
@@ -237,14 +238,12 @@ export default {
           cell =>
             !(cell.fixed || this.sheetLayout[cell.sheetRowDef].anklickbar === 0)
         ) // filter out fixed cells
-        list = !(list.length > 1)
-            ? list
-            : list.filter(
-            cell =>
-              !(
-                cell.data.potential === 0 || cell.data.dicesMatch.length === 0
-              )
-          ) // if there is more then one non-fixed cell, filter out the useless ones
+        list = !(list.length > 1) ? list : list.filter(
+          cell =>
+            !(
+              cell.data.potential === 0 || cell.data.dicesMatch.length === 0
+            )
+        ) // if there is more then one non-fixed cell, filter out the useless ones
         list = this.sort_list(list)
         // console.log('die liste komplett: ', list)
         // list.sort((a, b) => {
@@ -295,13 +294,13 @@ export default {
       const highestValuedCell = deepCopyColumn.shift()
       if (!highestValuedCell) return
       /*
-                                                                    console.log(
-                                                                      "locked: ",
-                                                                      this.sheetLayout[highestValuedCell.sheetRowDef].name,
-                                                                      highestValuedCell.value,
-                                                                      highestValuedCell
-                                                                    );
-                                                                    console.log("________________"); */
+                                                                                                    console.log(
+                                                                                                      "locked: ",
+                                                                                                      this.sheetLayout[highestValuedCell.sheetRowDef].name,
+                                                                                                      highestValuedCell.value,
+                                                                                                      highestValuedCell
+                                                                                                    );
+                                                                                                    console.log("________________"); */
       // deepCopyColumn is a sorted-by-value array, with shift it returns first element(highest value) and sheetRowDef gets its' row
       // basically: row of the highest-valued cell
       this.$emit('fixedCell', [

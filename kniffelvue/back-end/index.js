@@ -59,7 +59,7 @@ app.post('/yahtzee/turn', (req, res) => {
     sheetColumn: req.body.SheetColumn
   }
   if (turnInfo.sheetColumn.filter(el => el === null).length <= 0) {
-    console.log('Empty sheetColumn, eat shit!')
+    console.log('sheetColumn has no empty cells, eat shit!')
     res.json({
       DiceLocks: [],
       CategoryIndex: 0

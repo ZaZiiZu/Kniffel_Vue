@@ -12,12 +12,11 @@
 <script>
 export default {
   name: 'DiceRolls',
-  data () {
+  data() {
     return {
       size: '5px',
       rollCounter: 3,
-      dices: {
-      },
+      dices: {},
       allRolls: null,
       dice_unicodes: {
         0: '-',
@@ -35,14 +34,14 @@ export default {
 
   watch: {
     // watched object in "" so it watches deep
-    'state.newTurn': function resetRolls_deleteDices () {
+    'state.newTurn': function resetRolls_deleteDices() {
       if (this.state.newTurn === 1) {
         this.rollCounter = this.settingsCmptd.maxRolls
         this.dices = {}
       }
       return this.state
     },
-    'rollsRequest.getDices': function rollAndEmitDices () {
+    'rollsRequest.getDices': function rollAndEmitDices() {
       const newRolls = this.generate_dices()
       // eslint-disable-next-line no-unused-vars
       const cheatz = this.dices
@@ -51,7 +50,7 @@ export default {
     }
   },
   computed: {
-    settingsCmptd () {
+    settingsCmptd() {
       const settings = {}
       settings.diceAmount = this.state.settings.diceAmount || 5
       settings.maxRolls = this.state.settings.maxRolls || 3
@@ -60,7 +59,7 @@ export default {
   },
   methods: {
     // On first roll, generate dices for all rolls. then replace un-fixed dices with pushed out elements from next sub-array
-    generate_dices (asdf) {
+    generate_dices(asdf) {
       if (this.state.newTurn === 1 || this.state.newGame) {
         this.allRolls = this.generate_rolls(this.settingsCmptd.diceAmount, this.settingsCmptd.maxRolls)
       }
@@ -69,16 +68,18 @@ export default {
       // prioritize direct input over saved arrays of rolls over individual random rolls
       const cheatedDices = asdf || this.allRolls[ArrayNr].slice() || [0]
       for (let i = 1; i <= this.settingsCmptd.diceAmount; i += 1) {
-        if (
-          !this.dices['d'.concat(i)] || // initiate, in case dices are empty (new game or turn)
+        if (!this.dices['d'.concat(i)] || // initiate, in case dices are empty (new game or turn)
             (this.dices['d'.concat(i)] &&
               this.dices['d'.concat(i)].fixed === false) // only the not-fixed elements get re-rolled
         ) {
-          this.dices['d'.concat(i)] = {
+          this.$set(this.dices, 'd'.concat(i), {
             value: cheatedDices.shift() || Math.floor(Math.random() * 6) + 1,
             key: 'dice' + i,
             fixed: false
-          }
+          })
+          // this.dices['d'.concat(i)] = {
+
+          // }
         }
       }
       const dicesClean = []
@@ -111,7 +112,7 @@ export default {
     },
 
     // generates ALL rolls
-    generate_rolls (dicesPerRoll_param, amountRolls_param) {
+    generate_rolls(dicesPerRoll_param, amountRolls_param) {
       let newAllRolls = 0
       newAllRolls = []
       const dicesPerRoll = dicesPerRoll_param || 5
@@ -126,12 +127,12 @@ export default {
     },
 
     // toggles the fix on dices via @click, refresh dices to trigger template reload
-    fix_dice (itemid) {
+    fix_dice(itemid) {
       this.dices[itemid].fixed = !this.dices[itemid].fixed
       this.dices = Object.assign({}, this.dices)
     }
   },
-  mounted () {
+  mounted() {
     // this.generate_dices();
   }
 }
