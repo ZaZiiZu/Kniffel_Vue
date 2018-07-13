@@ -2,8 +2,8 @@
   <v-app>
     <div class="Kniffel">
       <!-- <div style="padding: 20px; width: 100%">
-        <TransfMatrices></TransfMatrices>
-      </div> -->
+                <TransfMatrices></TransfMatrices>
+            </div> -->
       <v-btn @click="serverGet()"> buttooon </v-btn>
       <v-container fluid>
         <v-layout row wrap>
@@ -12,12 +12,12 @@
               <v-flex d-flex>
                 <v-card>
                   <div class='sheet'>
+                    <!-- <v-btn :ripple="false" @click="undo_turn()" :disabled="(state.newTurn==0)" :class="{highlighted: state.newTurn==1}">{{undoButton}}</v-btn> -->
+                    <v-btn :ripple="false" @click="new_game()" :class="{highlighted: state.newGame==1 }">New Game! </v-btn>
+                    <v-btn :ripple="false" @click="loop_games()" :class="{highlighted: state.newGame==1 }">loop 50-time </v-btn>
                     <sheet v-model="state.rollsArray" v-on:fixedCell='fixCell' v-bind:sheetDataJSON='JSON.stringify(sheetData)' v-bind:sheetLayout='sheet'
                       v-bind:state='state'></sheet>
-                    <div class='sheet'>
-                      <v-btn :ripple="false" @click="undo_turn()" :disabled="(state.newTurn==0)" :class="{highlighted: state.newTurn==1}">{{undoButton}}</v-btn>
-                      <v-btn :ripple="false" @click="new_game()" :class="{highlighted: state.newGame==1 }">New Game! </v-btn>
-                      <v-btn :ripple="false" @click="loop_games()" :class="{highlighted: state.newGame==1 }">loop {{loop.runs}}-time(s) </v-btn>
+                    <div class='buttons'>
                     </div>
                   </div>
                 </v-card>
@@ -177,7 +177,7 @@ export default {
 
         settings: {
           playerAmount: null,
-          activeAI: null,
+          compSettings: null,
           startingPlayer: null,
           diceAmount: null,
           maxRolls: null
@@ -198,13 +198,18 @@ export default {
 
   watch: {
     'state.newTurn': function check_computersTurn() {
-      const aiSet = new Set(this.state.settings.activeAI)
+      // const aiSet = new Set(this.state.settings.compSettings)
       if (this.state.newTurn === 1) this.sheetDataFunc() // re-fresh the sheet, mainly with zero-padding
+      console.log('for real? ', this.state.currentPlayer, this.state.settings.compSettings[this.state.currentPlayer]
+        .isActive)
       if (
-        this.state.newTurn === 0 && aiSet.has(this.state.currentPlayer)
+      // this.state.newTurn === 0 && aiSet.has(this.state.currentPlayer)
+        this.state.newTurn === 0 && this.state.settings.compSettings[this.state.currentPlayer].isActive
+
       ) {
-        console.log('for real? ', aiSet, this.state.currentPlayer, aiSet.has(this.state.currentPlayer), JSON.stringify(
-          aiSet))
+        console.log('for real? ', this.state.currentPlayer, this.state.settings.compSettings[this.state
+          .currentPlayer]
+          .isActive)
         console.log('computers turn')
         this.state.computersTurn = true
       } else {
@@ -239,7 +244,7 @@ export default {
     settingsCmptd() {
       const settings1 = {}
       settings1.playerAmount = this.state.settings.playerAmount || 2
-      settings1.activeAI = new Set(this.state.settings.activeAI || [0])
+      // settings1.compSettings = new Set(this.state.settings.compSettings || [0])
       settings1.startingPlayer = this.state.settings.startingPlayer || 1
 
       return settings1
@@ -253,8 +258,7 @@ export default {
       lulz.highest = this.loop.scoreTracker.length ? Math.max(...this.loop.scoreTracker) : 0
       lulz.lowest = this.loop.scoreTracker.length ? Math.min(...this.loop.scoreTracker) : 0
       lulz.amount = this.loop.scoreTracker.length
-      lulz.average = this.loop.scoreTracker.length >= 2
-          ? this.loop.scoreTracker.reduce((a, b) => a + b) / lulz.amount
+      lulz.average = this.loop.scoreTracker.length >= 2 ? this.loop.scoreTracker.reduce((a, b) => a + b) / lulz.amount
           : this.loop.scoreTracker[0]
       lulz.average = Math.round((lulz.average || 0) * 100) / 100
       lulz.sheetAvg = this.loop.arrayStorage.length >= 2
@@ -339,12 +343,15 @@ export default {
       // applying new settings
       const settingsS = this.state.settings
       settingsS.playerAmount = settingsBundle.playerAmount
-      settingsS.activeAI = settingsBundle.activeAI
+      settingsS.AIObj = settingsBundle.compSettings
+      settingsS.compSettings = settingsBundle.compSettings //Object.keys(settingsBundle.compSettings).filter(el => settingsBundle.compSettings[el].isActive)
       settingsS.diceAmount = settingsBundle.diceAmountNew
       settingsS.maxRolls = settingsBundle.maxRollsNew
       this.loop.runs = settingsBundle.loopMax
       console.log('loops: ', settingsBundle.loopMax)
-      this.new_game()
+      this.new_game({
+        hardReset: true
+      })
     },
     sheetDataFunc() {
       let x // x = {result: integer, dicesMatch: [], dicesMatchNot: [] }
@@ -363,7 +370,8 @@ export default {
           sheetDataColumnX: this.sheetData[this.state.currentPlayer],
           playerX: this.state.currentPlayer,
           rollsLeft: this.state.rollCounter,
-          turnsLeft: this.sheetData ? this.sheetData[this.state.currentPlayer].filter(n => !n.fixed).length : this
+          turnsLeft: this.sheetData ? this.sheetData[this.state.currentPlayer].filter(n => !n.fixed)
+            .length : this
             .sheetLayout.length
         })
         const cell = this.sheetData[this.state.currentPlayer][j]
@@ -429,7 +437,8 @@ export default {
         this.sheetData = Object.assign({}, this.sheetData)
         this.writeLogAdd(
           this.state.currentPlayer,
-          ' +' + this.sheetData[cellColAndRow[0]][cellColAndRow[1]].value + ' ' + this.sheet[cellColAndRow[1]].name
+          ' +' + this.sheetData[cellColAndRow[0]][cellColAndRow[1]].value + ' ' + this.sheet[
+            cellColAndRow[1]].name
         )
         // eslint-disable-next-line no-unused-vars
         const cheatz = this.sheetDataFunc() // forcing a re-fresh of sheetData before changing player
@@ -471,7 +480,10 @@ export default {
                   this.loop.runs,
                   this.loop.scoreTracker
                 )
-                if (this.layout && this.layout.tabsCurrentItem) this.layout.tabsCurrentItem = '2'
+                if (this.layout && this.layout.tabsCurrentItem) {
+                  this.layout.tabsCurrentItem =
+                        '2'
+                }
               }
               this.$forceUpdate()
             })
@@ -504,7 +516,7 @@ export default {
       this.rollsOverride = !this.rollsOverride
       this.writeLogRemoveLast(this.state.currentPlayer, 2)
     },
-    new_game() {
+    new_game(paramsObj) {
       this.generate_sheetData()
       this.generate_playerLog()
       this.state.currentPlayer = this.playerNr || 1
@@ -546,7 +558,9 @@ export default {
     }
   },
   created() {
-    this.new_game()
+    this.new_game({
+      hardReset: true
+    })
   },
   // -----------------------------------------------------
   components: {
