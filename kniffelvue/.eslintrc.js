@@ -2,7 +2,8 @@ module.exports = {
   root: true,
   env: {
     node: true
-  },
+    },
+  plugins: ['vue'], // enable vue plugin
   'extends': [
     'plugin:vue/essential',
     '@vue/standard'
